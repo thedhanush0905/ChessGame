@@ -4,11 +4,13 @@ import com.example.IndiChessBackend.service.UserDetailService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -23,30 +25,31 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain newSpringSecurityFilterChain(HttpSecurity http){
+    public SecurityFilterChain newSpringSecurityFilterChain(HttpSecurity http) throws Exception{
 
         // RULE 1: Who goes where?
         return http
         .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/hello").permitAll()
-                .requestMatchers("/").permitAll()
+//                .requestMatchers("/world").permitAll()
 //                .requestMatchers("/all").permitAll()
 //                .requestMatchers("/hidden-resource").denyAll()
-//                .anyRequest().authenticated()
+                .anyRequest().authenticated()
         )
         // RULE 2: How to login?
-//        .formLogin(form -> form
+        .formLogin(Customizer.withDefaults())
+//                form -> form
 //                .loginPage("/login")
-//                .defaultSuccessUrl("/redirectTo")
+//                .defaultSuccessUrl("/hello", true)
 //                .permitAll()
         //)// RULE 3: How to logout?
 //                .logout(logout -> logout
-//                        .logoutUrl("/redirect")    // exit door
-//                        .logoutSuccessUrl("/goodbye") // Wave goodbye page
+//                        .logoutUrl("/logout")    // exit door
+//                        .logoutSuccessUrl("/") // Wave goodbye page
 //                        .permitAll()
 //                )
                 // RULE 4: Stop dragon spies!
-//                .csrf(csrf -> csrf.disable())    //protection (usually ON!)
+                .csrf(csrf -> csrf.disable())    //protection (usually ON!)
                 .build();  // BUILD THE SECURITY SYSTEM!
     }
 
@@ -54,7 +57,7 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); // Use BCryptPasswordEncoder for password hashing
+        return (NoOpPasswordEncoder) NoOpPasswordEncoder.getInstance(); // Use BCryptPasswordEncoder for password hashing
     }
 
     @Bean
@@ -64,8 +67,8 @@ public class SecurityConfig {
 
         // Set the UserDetailsService and password encoder
         authenticationManagerBuilder
-                .userDetailsService(userDetailService)
-                .passwordEncoder(passwordEncoder());
+                .userDetailsService(userDetailService);
+
 
         // Return the AuthenticationManager object
         return authenticationManagerBuilder.build();
