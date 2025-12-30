@@ -1,5 +1,6 @@
 package com.example.IndiChessBackend.config;
 
+import com.example.IndiChessBackend.security.JwtAuthenticationFilter;
 import com.example.IndiChessBackend.service.UserDetailService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,11 +9,13 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -30,7 +33,7 @@ public class SecurityConfig {
         // RULE 1: Who goes where?
         return http
         .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/hello").permitAll()
+                .requestMatchers("/login").permitAll()
 //                .requestMatchers("/world").permitAll()
 //                .requestMatchers("/all").permitAll()
 //                .requestMatchers("/hidden-resource").denyAll()
@@ -49,17 +52,17 @@ public class SecurityConfig {
 //                        .permitAll()
 //                )
                 // RULE 4: Stop dragon spies!
-                .csrf(csrf -> csrf.disable())    //protection (usually ON!)
+                .addFilterBefore(new JwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))//protection (usually ON!)
+                .csrf(csrf -> csrf.disable())
                 .build();  // BUILD THE SECURITY SYSTEM!
     }
-
-
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return (NoOpPasswordEncoder) NoOpPasswordEncoder.getInstance(); // Use BCryptPasswordEncoder for password hashing
     }
-
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         AuthenticationManagerBuilder authenticationManagerBuilder =
