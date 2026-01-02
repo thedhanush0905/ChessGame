@@ -7,26 +7,26 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.UniqueElements;
+import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
 @Table(name = "users")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class User  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long userId;
     @Size(min = 4, max = 50,
             message = "Username must have characters between 4 and 50")
-    @UniqueElements
+
     String userName;
 
-    @UniqueElements
     String emailId;
 
-    @UniqueElements
     @Size(min=6,max=512)
     String password;
+
 
 }
