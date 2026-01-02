@@ -21,8 +21,10 @@ public class User  {
     @Size(min = 4, max = 50,
             message = "Username must have characters between 4 and 50")
 
-    String userName;
+    @Column(name = "user_name")
+    String username;
 
+    @Column(name = "email_id")
     String emailId;
 
     @Size(min=6,max=512)
