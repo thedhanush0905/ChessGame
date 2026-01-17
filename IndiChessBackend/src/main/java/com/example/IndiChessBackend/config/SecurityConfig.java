@@ -18,6 +18,10 @@ import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -26,6 +30,7 @@ public class SecurityConfig {
 
     private final MyUserDetailsService userDetailService;
     private final JwtFilter jwtFilter;
+    private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 
     @Bean
     PasswordEncoder passwordEncoder(){
@@ -50,38 +55,34 @@ public class SecurityConfig {
     public SecurityFilterChain newSpringSecurityFilterChain(HttpSecurity http) throws Exception{
         return http
         .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/login",  "/auth/**").permitAll()
+                .requestMatchers("/login",  "/auth/**", "/ws-chess", "/ws-chess/**", "/oauth2/**").permitAll()
                 .anyRequest().authenticated()
         )
                 .addFilterBefore(jwtFilter,
                         UsernamePasswordAuthenticationFilter.class)
+        .oauth2Login(oauth2 -> oauth2
+                .successHandler(oAuth2LoginSuccessHandler)
+        )
+        .cors(Customizer.withDefaults())
         .csrf(csrf -> csrf.disable())
         .sessionManagement(session ->
                 session.sessionCreationPolicy
                         (SessionCreationPolicy.STATELESS))
-        .httpBasic(Customizer.withDefaults())
         .build();  // BUILD THE SECURITY SYSTEM!
-//        return http
-//                .csrf(csrf -> csrf.disable())
-//
-//                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-//
-////                .securityContext(sc -> sc.requireExplicitSave(false)) // optional, safe
-////                .requestCache(rc -> rc.disable())                     // avoids saving requests in session
-//
-//                .authorizeHttpRequests(auth -> auth
-//                        .requestMatchers("/login", "/hello", "/auth/**").permitAll()
-//                        .anyRequest().authenticated()
-//                )
-//
-////                .httpBasic(Customizer.withDefaults())
-//                .formLogin(Customizer.withDefaults())
-//                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-//                .build();
     }
 
-
-
-
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(List.of("http://localhost:3000"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowCredentials(true);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
 
 }
+
+
