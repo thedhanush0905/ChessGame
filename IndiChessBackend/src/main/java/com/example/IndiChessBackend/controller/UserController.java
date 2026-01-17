@@ -1,6 +1,8 @@
 package com.example.IndiChessBackend.controller;
 
 import com.example.IndiChessBackend.model.DTO.LoginDto;
+import com.example.IndiChessBackend.model.User;
+import com.example.IndiChessBackend.repo.UserRepo;
 import com.example.IndiChessBackend.service.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -15,11 +17,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 public class UserController {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final UserRepo userRepo;
 
     @GetMapping("/hello")
     public String show(){
@@ -46,6 +51,12 @@ public class UserController {
         }
 
         return new ResponseEntity<>("Auth Failed", HttpStatus.BAD_REQUEST);
+    }
+
+    @GetMapping("/users")
+    public ResponseEntity<List<User>> getAllUsers() {
+        List<User> users = userRepo.findAll();
+        return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
 }
