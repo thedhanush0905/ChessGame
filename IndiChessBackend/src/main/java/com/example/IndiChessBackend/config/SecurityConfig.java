@@ -55,7 +55,7 @@ public class SecurityConfig {
     public SecurityFilterChain newSpringSecurityFilterChain(HttpSecurity http) throws Exception{
         return http
         .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/login",  "/auth/**", "/ws-chess", "/ws-chess/**", "/oauth2/**").permitAll()
+                .requestMatchers("/login",  "/auth/**", "/ws-chess", "/ws-chess/**", "/oauth2/**", "/hello", "/world").permitAll()
                 .anyRequest().authenticated()
         )
                 .addFilterBefore(jwtFilter,

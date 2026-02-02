@@ -1,0 +1,25 @@
+# Multi-stage build for Spring Boot backend
+FROM maven:latest AS builder
+
+WORKDIR /app
+
+# Copy pom.xml and source code
+COPY IndiChessBackend/pom.xml .
+COPY IndiChessBackend/src ./src
+
+# Build the application
+RUN mvn clean package -DskipTests || true
+
+# Runtime stage
+FROM openjdk:latest
+
+WORKDIR /app
+
+# Copy JAR from builder if it exists
+COPY --from=builder /app/target/*.jar app.jar || true
+
+# Expose port
+EXPOSE 8080
+
+# Run the application
+ENTRYPOINT ["java", "-jar", "app.jar"]

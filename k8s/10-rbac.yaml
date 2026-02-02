@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: indichess-sa
+  namespace: indichess
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: indichess-role
+  namespace: indichess
+rules:
+- apiGroups: [""]
+  resources: ["configmaps", "secrets"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: indichess-rolebinding
+  namespace: indichess
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: indichess-role
+subjects:
+- kind: ServiceAccount
+  name: indichess-sa
+  namespace: indichess

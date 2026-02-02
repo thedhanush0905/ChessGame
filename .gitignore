@@ -1,0 +1,49 @@
+# Build artifacts
+*.class
+*.jar
+*.war
+target/
+build/
+dist/
+
+# IDE
+.idea/
+.vscode/settings.json
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+*.log
+
+# Java source files for microservices (contain sensitive data)
+APIGateway.java
+AuthService.java
+UserService.java
+GameService.java
+MatchmakingService.java
+NotificationService.java
+EurekaServer.java
+ChessBot.java
+SimpleURLDecoder.java
+
+# Environment variables
+.env
+.env.local
+
+# Node modules
+node_modules/
+npm-debug.log
+
+# MySQL/Database
+*.sql.backup
+
+# Compiled Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# OS
+.DS_Store
+Thumbs.db
